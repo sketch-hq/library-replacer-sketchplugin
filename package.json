@@ -1,0 +1,30 @@
+{
+  "name": "replace-library",
+  "version": "0.1.0",
+  "description": "Allows you to replace a library in a Sketch file",
+  "engines": {
+    "sketch": ">=3.0"
+  },
+  "skpm": {
+    "name": "Replace Library",
+    "manifest": "src/manifest.json",
+    "main": "replace-library.sketchplugin",
+    "assets": [
+      "assets/**/*"
+    ]
+  },
+  "scripts": {
+    "build": "skpm-build",
+    "watch": "skpm-build --watch",
+    "start": "skpm-build --watch --run",
+    "postinstall": "npm run build && skpm-link"
+  },
+  "devDependencies": {
+    "@skpm/builder": "^0.5.11"
+  },
+  "author": "Bohemian Coding",
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/skpm/replace-library"
+  }
+}
