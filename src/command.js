@@ -6,7 +6,7 @@ const getLibraryTypeName = function(library) {
   switch (library.libraryType) {
     case Library.LibraryType.Internal: return 'Internal'
     case Library.LibraryType.User: return 'Local'
-    case Library.LibraryType.Remote: return 'Remote'
+    case Library.LibraryType.Remote: return 'Sketch Cloud'
   }
 }
 
