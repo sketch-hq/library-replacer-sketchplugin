@@ -11,7 +11,6 @@ const getLibraryTypeName = function(library) {
 }
 
 const replaceSymbols = function(document, library) {
-  const overridesById = new Map()
   const docSymbols = document.getSymbols()
   let allSymbolInstances = []
   const symbolsMap = new Map()
@@ -41,14 +40,13 @@ const replaceSymbols = function(document, library) {
     const symbolInstances = docSymbolMaster.getAllInstances()
     allSymbolInstances = allSymbolInstances.concat(symbolInstances)
     symbolInstances.forEach(symbolInstance => {
-      overridesById.set(symbolInstance.id, symbolInstance.overrides)
-      symbolInstance.master = importedSymbolMaster
+      symbolInstance.symbolId = importedSymbolMaster.symbolId
     })
 
     docSymbolMaster.parent = null
   })
 
-  return {symbolsMap, symbolInstances: allSymbolInstances, overridesById}
+  return {symbolsMap, symbolInstances: allSymbolInstances}
 }
 
 const replaceSharedStyles = function(docSharedStyles, libSharedStyles) {
@@ -78,10 +76,9 @@ const replaceSharedStyles = function(docSharedStyles, libSharedStyles) {
   return sharedStylesMap
 }
 
-const updateSymbolsOverrides = function(symbolInstances, overridesById, symbolsMap, layerStylesMap, textStylesMap) {
+const updateSymbolsOverrides = function(symbolInstances, symbolsMap, layerStylesMap, textStylesMap) {
   symbolInstances.forEach(symbolInstance => {
-    const overrides = overridesById.get(symbolInstance.id)
-    overrides.forEach(override => {
+    symbolInstance.overrides.forEach(override => {
       switch (override.property) {
         case 'symbolID':
           if (symbolsMap.has(override.value)) {
@@ -116,7 +113,7 @@ const getImportableSharedStyles = function(importableObjectType, document, libra
 }
 
 const replaceWithLibrary = function(document, library) {
-  const { symbolsMap, symbolInstances, overridesById } = replaceSymbols(document, library)
+  const { symbolsMap, symbolInstances } = replaceSymbols(document, library)
 
   const importableLayerStyles = getImportableSharedStyles(Library.ImportableObjectType.LayerStyle, document, library)
   const layerStylesMap = replaceSharedStyles(document.sharedLayerStyles, importableLayerStyles)
@@ -124,7 +121,7 @@ const replaceWithLibrary = function(document, library) {
   const importableTextStyles = getImportableSharedStyles(Library.ImportableObjectType.TextStyle, document, library)
   const textStylesMap = replaceSharedStyles(document.sharedTextStyles, importableTextStyles)
 
-  updateSymbolsOverrides(symbolInstances, overridesById, symbolsMap, layerStylesMap, textStylesMap)
+  updateSymbolsOverrides(symbolInstances, symbolsMap, layerStylesMap, textStylesMap)
   document.sketchObject.reloadInspector()
 }
 
