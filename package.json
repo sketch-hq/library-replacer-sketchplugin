@@ -22,7 +22,7 @@
   "devDependencies": {
     "@skpm/builder": "^0.5.11"
   },
-  "author": "Bohemian Coding",
+  "author": "Sketch",
   "license": "MIT",
   "repository": {
     "url": "https://github.com/skpm/replace-library"
