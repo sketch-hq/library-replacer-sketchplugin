@@ -133,15 +133,18 @@ const replaceLibrary = function(document, fromLibraryId, toLibrary) {
 const getReferencedLibrariesForSymbols = function(document, librariesById) {
   document.getSymbols().forEach(symbolMaster => {
     const library = symbolMaster.getLibrary()
-    if (!library) return
-    librariesById.set(getLibraryId(library), library)
+    if (library) {
+      librariesById.set(getLibraryId(library), library)
+    }
   })
 }
 
 const getReferencedLibrariesForSharedStyles = function(sharedStyles, librariesById) {
   sharedStyles.forEach(sharedStyle => {
-    if (!sharedStyle.getLibrary()) return
-    librariesById.set(getLibraryId(library), library)
+    const library = sharedStyle.getLibrary()
+    if (library) {
+      librariesById.set(getLibraryId(library), library)
+    }
   })
 }
 
@@ -176,7 +179,7 @@ const buildMainDialog = function(fromLibraries, toLibraries) {
   const view = NSView.alloc().initWithFrame(NSMakeRect(0, 0, width, height))
   let fromLibraryPopUpBtn, toLibraryPopUpBtn
   if (fromLibraries.length > 1) {
-    y = addSubview(buildLabel(0, y - 17, width, 17, 'Old Library', 12), view, 3, y)
+    y = addSubview(buildLabel(0, y - 17, width, 17, 'Replace Existing Library', 12), view, 3, y)
     fromLibraryPopUpBtn = buildPopUpButton(0, y - 25, width, 25, getLibraryNames(fromLibraries))
     fromLibraryPopUpBtn.setCOSJSTargetFunction(dropDown => {
       const fromLibrary = fromLibraries[dropDown.indexOfSelectedItem()]
@@ -184,11 +187,11 @@ const buildMainDialog = function(fromLibraries, toLibraries) {
       toLibraryPopUpBtn.addItemsWithTitles(getLibraryNames(filterLibraries(toLibraries, fromLibrary)))
     })
     y = addSubview(fromLibraryPopUpBtn, view, 8, y)
-    y = addSubview(buildLabel(0, y - 17, 200, 17, 'New Library', 12), view, 3, y)
+    y = addSubview(buildLabel(0, y - 17, 200, 17, 'With New Library', 12), view, 3, y)
   }
   toLibraryPopUpBtn = buildPopUpButton(0, y - 25, width, 25, getLibraryNames(filterLibraries(toLibraries, fromLibraries[0])))
   view.addSubview(toLibraryPopUpBtn)
-  const text = fromLibraries.length > 1 ? 'Select the library you want to replace.' : 'Select the new library you want to replace the old library with.'
+  const text = fromLibraries.length > 1 ? 'Select the existing and new library you want to swap.' : 'Select the new library you want to replace the existing library with.'
   return {dialog: buildDialog(pluginName, text, 'Replace', view), fromLibraryPopUpBtn, toLibraryPopUpBtn}
 }
 
