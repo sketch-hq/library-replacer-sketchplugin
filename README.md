@@ -1,16 +1,16 @@
 # Replace Library Plugin
 
-Allows you to replace a library in a Sketch file by replacing symbols, layer and text styles from an existing library with ones from a new library.
+Allows you to replace a library in a Sketch file by replacing symbols, layer and text styles from an existing library with those from a new library.
 
 This plugin is based on [Camilo](https://github.com/Pausansol/Camilo).
 
 ## Installation
  
-### Download the plugin (simplest)
+### From a release (simplest)
  
-- [Download the plugin](https://github.com/skpm/replace-library/releases/latest)
-- Un-zip
-- Double-click on `replace-library.sketchplugin`
+- [Download](https://github.com/skpm/replace-library/releases/latest) the latest release of the plugin
+- Double-click the .zip file to extract the plugin
+- Double-click `replace-library.sketchplugin` to install the plugin
  
 ### From source
  
