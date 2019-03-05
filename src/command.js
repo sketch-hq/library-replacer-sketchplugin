@@ -1,6 +1,9 @@
 const sketch = require('sketch')
 const UI = require('sketch/ui')
 const { Library } = require('sketch/dom')
+const { buildDialog, buildLabel, buildPopUpButton, addSubview } = require('./ui-utils')
+
+const pluginName = 'Replace Library'
 
 const getLibraryTypeName = function(library) {
   switch (library.libraryType) {
@@ -10,7 +13,7 @@ const getLibraryTypeName = function(library) {
   }
 }
 
-const replaceSymbols = function(document, library) {
+const replaceSymbols = function(document, fromLibraryId, toLibrary) {
   const docSymbols = document.getSymbols()
   let allSymbolInstances = []
   const symbolsMap = new Map()
@@ -19,14 +22,15 @@ const replaceSymbols = function(document, library) {
     return {symbolsMap, symbolInstances: allSymbolInstances}
   }
 
-  const libSymbols = library.getImportableSymbolReferencesForDocument(document)
+  const libSymbols = toLibrary.getImportableSymbolReferencesForDocument(document)
   let libSymbolsByName = new Map()
   libSymbols.forEach(libSymbol => {
     libSymbolsByName.set(libSymbol.name, libSymbol)
   })
 
   docSymbols.forEach(docSymbolMaster => {
-    if (!docSymbolMaster.getLibrary()) {
+    const library = docSymbolMaster.getLibrary()
+    if (!library || getLibraryId(library) !== fromLibraryId) {
       return
     }
     const libSymbol = libSymbolsByName.get(docSymbolMaster.name)
@@ -49,7 +53,7 @@ const replaceSymbols = function(document, library) {
   return {symbolsMap, symbolInstances: allSymbolInstances}
 }
 
-const replaceSharedStyles = function(docSharedStyles, libSharedStyles) {
+const replaceSharedStyles = function(docSharedStyles, libSharedStyles, fromLibraryId) {
   const sharedStylesMap = new Map()
 
   const libSharedStylesByName = new Map()
@@ -58,7 +62,8 @@ const replaceSharedStyles = function(docSharedStyles, libSharedStyles) {
   })
 
   docSharedStyles.forEach(docSharedStyle => {
-    if (!docSharedStyle.getLibrary()) {
+    const library = docSharedStyle.getLibrary()
+    if (!library || getLibraryId(library) !== fromLibraryId) {
       return
     }
     const libSharedStyle = libSharedStylesByName.get(docSharedStyle.name)
@@ -112,31 +117,97 @@ const getImportableSharedStyles = function(importableObjectType, document, libra
   }
 }
 
-const replaceWithLibrary = function(document, library) {
-  const { symbolsMap, symbolInstances } = replaceSymbols(document, library)
+const replaceLibrary = function(document, fromLibraryId, toLibrary) {
+  const { symbolsMap, symbolInstances } = replaceSymbols(document, fromLibraryId, toLibrary)
 
-  const importableLayerStyles = getImportableSharedStyles(Library.ImportableObjectType.LayerStyle, document, library)
-  const layerStylesMap = replaceSharedStyles(document.sharedLayerStyles, importableLayerStyles)
+  const importableLayerStyles = getImportableSharedStyles(Library.ImportableObjectType.LayerStyle, document, toLibrary)
+  const layerStylesMap = replaceSharedStyles(document.sharedLayerStyles, importableLayerStyles, fromLibraryId)
 
-  const importableTextStyles = getImportableSharedStyles(Library.ImportableObjectType.TextStyle, document, library)
-  const textStylesMap = replaceSharedStyles(document.sharedTextStyles, importableTextStyles)
+  const importableTextStyles = getImportableSharedStyles(Library.ImportableObjectType.TextStyle, document, toLibrary)
+  const textStylesMap = replaceSharedStyles(document.sharedTextStyles, importableTextStyles, fromLibraryId)
 
   updateSymbolsOverrides(symbolInstances, symbolsMap, layerStylesMap, textStylesMap)
   document.sketchObject.reloadInspector()
 }
 
-export default function() {
-  const libraries = sketch.getLibraries().filter(library => library.valid && library.enabled).sort((library1, library2) => {
-    return library1.name.localeCompare(library2.name)
+const getReferencedLibrariesForSymbols = function(document, librariesById) {
+  document.getSymbols().forEach(symbolMaster => {
+    const library = symbolMaster.getLibrary()
+    if (!library) return
+    librariesById.set(getLibraryId(library), library)
   })
-  const libraryLabels = libraries.map(library => `${library.name} (${getLibraryTypeName(library)})`)
+}
 
-  UI.getInputFromUser('Select the new library you want to replace with', {
-    type: UI.INPUT_TYPE.selection,
-    possibleValues: libraryLabels
-  }, (error, value) => {
-    if (!error) {
-      replaceWithLibrary(sketch.getSelectedDocument(), libraries[libraryLabels.indexOf(value)])
-    }
+const getReferencedLibrariesForSharedStyles = function(sharedStyles, librariesById) {
+  sharedStyles.forEach(sharedStyle => {
+    if (!sharedStyle.getLibrary()) return
+    librariesById.set(getLibraryId(library), library)
   })
+}
+
+const getCurrentlyReferencedLibraries = function(document) {
+  const librariesById = new Map()
+  getReferencedLibrariesForSymbols(document, librariesById)
+  getReferencedLibrariesForSharedStyles(document.sharedLayerStyles, librariesById)
+  getReferencedLibrariesForSharedStyles(document.sharedTextStyles, librariesById)
+  return Array.from(librariesById.values())
+}
+
+const getLibraryId = function(library) {
+  if (library) {
+    return `${library.id}.${library.name}.${library.libraryType}`
+  } else {
+    return null
+  }
+}
+
+const getLibraryNames = function(libraries) {
+  return libraries.map(library => `${library.name} (${getLibraryTypeName(library)})`)
+}
+
+const filterLibraries = function(libraries, library) {
+  return libraries.filter(itLibrary => !(itLibrary.name === library.name && itLibrary.id === library.id))
+}
+
+const buildMainDialog = function(fromLibraries, toLibraries) {
+  const width = 250
+  const height = fromLibraries.length > 1 ? 98 : 25
+  let y = height
+  const view = NSView.alloc().initWithFrame(NSMakeRect(0, 0, width, height))
+  let fromLibraryPopUpBtn, toLibraryPopUpBtn
+  if (fromLibraries.length > 1) {
+    y = addSubview(buildLabel(0, y - 17, width, 17, 'Old Library', 12), view, 3, y)
+    fromLibraryPopUpBtn = buildPopUpButton(0, y - 25, width, 25, getLibraryNames(fromLibraries))
+    fromLibraryPopUpBtn.setCOSJSTargetFunction(dropDown => {
+      const fromLibrary = fromLibraries[dropDown.indexOfSelectedItem()]
+      toLibraryPopUpBtn.removeAllItems()
+      toLibraryPopUpBtn.addItemsWithTitles(getLibraryNames(filterLibraries(toLibraries, fromLibrary)))
+    })
+    y = addSubview(fromLibraryPopUpBtn, view, 8, y)
+    y = addSubview(buildLabel(0, y - 17, 200, 17, 'New Library', 12), view, 3, y)
+  }
+  toLibraryPopUpBtn = buildPopUpButton(0, y - 25, width, 25, getLibraryNames(filterLibraries(toLibraries, fromLibraries[0])))
+  view.addSubview(toLibraryPopUpBtn)
+  const text = fromLibraries.length > 1 ? 'Select the library you want to replace.' : 'Select the new library you want to replace the old library with.'
+  return {dialog: buildDialog(pluginName, text, 'Replace', view), fromLibraryPopUpBtn, toLibraryPopUpBtn}
+}
+
+export default function() {
+  const document = sketch.getSelectedDocument()
+  const sortFunc = (library1, library2) => {
+    return library1.name.localeCompare(library2.name)
+  }
+  const fromLibraries = getCurrentlyReferencedLibraries(document).sort(sortFunc)
+  if (fromLibraries.length === 0) {
+    UI.alert(pluginName, "The document doesn't reference any libraries.")
+    return
+  }
+  const toLibraries = sketch.getLibraries().filter(library => library.valid && library.enabled).sort(sortFunc)
+  const { dialog, fromLibraryPopUpBtn, toLibraryPopUpBtn } = buildMainDialog(fromLibraries, toLibraries)
+  if (dialog.runModal() === NSAlertFirstButtonReturn) {
+    const fromLibrary = fromLibraries.length === 1 ? fromLibraries[0] : fromLibraries[fromLibraryPopUpBtn.indexOfSelectedItem()]
+    const toLibrary = filterLibraries(toLibraries, fromLibrary)[toLibraryPopUpBtn.indexOfSelectedItem()]
+    replaceLibrary(document, getLibraryId(fromLibrary), toLibrary)
+    UI.message('The library has been successfully replaced')
+  }
 }
