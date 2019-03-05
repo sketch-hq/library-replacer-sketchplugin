@@ -1,6 +1,6 @@
 {
   "name": "replace-library",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Allows you to replace a library in a Sketch file",
   "engines": {
     "sketch": ">=3.0"
