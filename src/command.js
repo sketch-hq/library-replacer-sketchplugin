@@ -191,7 +191,7 @@ const buildMainDialog = function(fromLibraries, toLibraries) {
   }
   toLibraryPopUpBtn = buildPopUpButton(0, y - 25, width, 25, getLibraryNames(filterLibraries(toLibraries, fromLibraries[0])))
   view.addSubview(toLibraryPopUpBtn)
-  const text = fromLibraries.length > 1 ? 'Select the existing and new library you want to swap.' : 'Select the new library you want to replace the existing library with.'
+  const text = fromLibraries.length > 1 ? 'Select the existing and new library you want to swap' : 'Select the new library you want to replace the existing library with'
   return {dialog: buildDialog(pluginName, text, 'Replace', view), fromLibraryPopUpBtn, toLibraryPopUpBtn}
 }
 
