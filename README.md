@@ -8,7 +8,7 @@ This plugin is based on [Camilo](https://github.com/Pausansol/Camilo).
  
 ### From a release (simplest)
  
-- [Download](https://github.com/skpm/replace-library/releases/latest) the latest release of the plugin
+- [Download](https://github.com/BohemianCoding/replace-library-sketchplugin/releases/latest) the latest release of the plugin
 - Double-click the .zip file to extract the plugin
 - Double-click `replace-library.sketchplugin` to install the plugin
  
