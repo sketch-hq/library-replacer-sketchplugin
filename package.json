@@ -1,6 +1,6 @@
 {
   "name": "library-replacer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Quickly replace instances of shared Symbols and Styles.",
   "engines": {
     "sketch": ">=3.0"
