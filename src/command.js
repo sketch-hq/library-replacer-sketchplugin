@@ -68,10 +68,12 @@ const replaceSharedStyles = function(docSharedStyles, libSharedStyles, fromLibra
     if (!library || getLibraryId(library) !== fromLibraryId) {
       return
     }
+
     const libSharedStyle = libSharedStylesByName.get(docSharedStyle.name)
     if (!libSharedStyle) {
       return
     }
+
     const importedSharedStyle = libSharedStyle.import()
     sharedStylesMap.set(docSharedStyle.id, importedSharedStyle.id)
     docSharedStyle.getAllInstancesLayers().forEach(layer => {
@@ -136,18 +138,18 @@ const replaceLibrary = function(document, fromLibraryId, toLibrary) {
 const getReferencedLibrariesForSymbols = function(document, librariesById) {
   document.getSymbols().forEach(symbolMaster => {
     const library = symbolMaster.getLibrary()
-    if (library) {
-      librariesById.set(getLibraryId(library), library)
-    }
+    if (!library) return
+
+    librariesById.set(getLibraryId(library), library)
   })
 }
 
 const getReferencedLibrariesForSharedStyles = function(sharedStyles, librariesById) {
   sharedStyles.forEach(sharedStyle => {
     const library = sharedStyle.getLibrary()
-    if (library) {
-      librariesById.set(getLibraryId(library), library)
-    }
+    if (!library) return
+
+    librariesById.set(getLibraryId(library), library)
   })
 }
 
@@ -160,11 +162,7 @@ const getCurrentlyReferencedLibraries = function(document) {
 }
 
 const getLibraryId = function(library) {
-  if (library) {
-    return `${library.id}.${library.name}.${library.libraryType}`
-  } else {
-    return null
-  }
+  return library ? `${library.id}.${library.name}.${library.libraryType}` : null
 }
 
 const getLibraryNames = function(libraries) {
