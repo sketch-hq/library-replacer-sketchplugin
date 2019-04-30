@@ -1,8 +1,9 @@
 # Library Replacer Plugin
 
-Allows you to replace a library in a Sketch file by replacing symbols, layer and text styles from an existing library with those from a new library.
+Quickly replace instances of shared Symbols and Styles by selecting the library that should be used instead.
 
-This plugin is based on [Camilo](https://github.com/Pausansol/Camilo).
+- Replaces Symbols, Layer and Text Styles
+- Supports local and Sketch Cloud Libraries
 
 ## Installation
  
@@ -19,4 +20,11 @@ This plugin is based on [Camilo](https://github.com/Pausansol/Camilo).
  
 ## Usage
  
-Open the Sketch file you want to replace the library and then go to _Plugins > Replace Library_. If the Sketch file references more than one library you will need to select the library you want to replace and the new library, otherwise you just select the new library.
+1. Open the Sketch document with Symbols, Layer and Text Styles you want to replace
+2. Choose _Plugins_ › _Library Replacer_
+3. If the Sketch document uses two or more libraries, select the Library for which you want to replace instances
+4. Select the replacement Library
+
+## Acknowledgements
+
+This plugin is based on [Camilo](https://github.com/Pausansol/Camilo).
