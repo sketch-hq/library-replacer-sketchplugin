@@ -3,7 +3,7 @@ const UI = require('sketch/ui')
 const { Library } = require('sketch/dom')
 const { buildDialog, buildLabel, buildPopUpButton, addSubview } = require('./ui-utils')
 
-const pluginName = 'Replace Library'
+const pluginName = 'Library Replacer'
 
 const getLibraryTypeName = function(library) {
   switch (library.libraryType) {

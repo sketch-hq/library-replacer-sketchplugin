@@ -1,14 +1,14 @@
 {
-  "name": "replace-library",
+  "name": "library-replacer",
   "version": "1.0.1",
-  "description": "Allows you to replace a library in a Sketch file",
+  "description": "Quickly replace instances of shared Symbols and Styles.",
   "engines": {
     "sketch": ">=3.0"
   },
   "skpm": {
-    "name": "Replace Library",
+    "name": "Library Replacer",
     "manifest": "src/manifest.json",
-    "main": "replace-library.sketchplugin",
+    "main": "library-replacer.sketchplugin",
     "assets": [
       "assets/**/*"
     ]
@@ -20,11 +20,11 @@
     "postinstall": "npm run build && skpm-link"
   },
   "devDependencies": {
-    "@skpm/builder": "^0.5.11"
+    "@skpm/builder": "^0.6.0"
   },
   "author": "Sketch",
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/BohemianCoding/replace-library-sketchplugin"
+    "url": "https://github.com/BohemianCoding/library-replacer-sketchplugin"
   }
 }

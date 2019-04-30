@@ -1,4 +1,4 @@
-# Replace Library Plugin
+# Library Replacer Plugin
 
 Allows you to replace a library in a Sketch file by replacing symbols, layer and text styles from an existing library with those from a new library.
 
@@ -8,9 +8,9 @@ This plugin is based on [Camilo](https://github.com/Pausansol/Camilo).
  
 ### From a release (simplest)
  
-- [Download](https://github.com/BohemianCoding/replace-library-sketchplugin/releases/latest) the latest release of the plugin
-- Double-click the .zip file to extract the plugin
-- Double-click `replace-library.sketchplugin` to install the plugin
+- Download the [latest release](https://github.com/BohemianCoding/library-replacer-sketchplugin/releases/latest) of the plugin
+- Double-click the .zip archive to extract the plugin
+- Double-click `library-replacer.sketchplugin` to install the plugin
  
 ### From source
  
