@@ -182,7 +182,7 @@ const buildMainDialog = function(fromLibraries, toLibraries) {
   const view = NSView.alloc().initWithFrame(NSMakeRect(0, 0, width, height))
   let fromLibraryPopUpBtn, toLibraryPopUpBtn
   if (fromLibraries.length > 1) {
-    y = addSubview(buildLabel(0, y - 17, width, 17, 'Replace Existing Library', 12), view, 3, y)
+    y = addSubview(buildLabel(0, y - 17, width, 17, 'From Library', 12), view, 3, y)
     fromLibraryPopUpBtn = buildPopUpButton(0, y - 25, width, 25, getLibraryNames(fromLibraries))
     fromLibraryPopUpBtn.setCOSJSTargetFunction(dropDown => {
       const fromLibrary = fromLibraries[dropDown.indexOfSelectedItem()]
@@ -190,11 +190,11 @@ const buildMainDialog = function(fromLibraries, toLibraries) {
       toLibraryPopUpBtn.addItemsWithTitles(getLibraryNames(filterLibraries(toLibraries, fromLibrary)))
     })
     y = addSubview(fromLibraryPopUpBtn, view, 8, y)
-    y = addSubview(buildLabel(0, y - 17, 200, 17, 'With New Library', 12), view, 3, y)
+    y = addSubview(buildLabel(0, y - 17, 200, 17, 'Replace with Library', 12), view, 3, y)
   }
   toLibraryPopUpBtn = buildPopUpButton(0, y - 25, width, 25, getLibraryNames(filterLibraries(toLibraries, fromLibraries[0])))
   view.addSubview(toLibraryPopUpBtn)
-  const text = fromLibraries.length > 1 ? 'Select the existing and new library you want to swap' : 'Select the new library you want to replace the existing library with'
+  const text = fromLibraries.length > 1 ? 'Replace instances of shared Symbols and Styles' : `Replace instances of shared Symbols and Styles from “${fromLibraries[0].name}” with`
   return {dialog: buildDialog(pluginName, text, 'Replace', view), fromLibraryPopUpBtn, toLibraryPopUpBtn}
 }
 
@@ -205,7 +205,7 @@ export default function() {
   }
   const fromLibraries = getCurrentlyReferencedLibraries(document).sort(sortFunc)
   if (fromLibraries.length === 0) {
-    UI.alert(pluginName, "The document doesn't reference any libraries.")
+    UI.alert(pluginName, 'No instances of shared Symbols and Styles to replace.')
     return
   }
   const toLibraries = sketch.getLibraries().filter(library => library.valid && library.enabled).sort(sortFunc)
@@ -214,6 +214,7 @@ export default function() {
     const fromLibrary = fromLibraries.length === 1 ? fromLibraries[0] : fromLibraries[fromLibraryPopUpBtn.indexOfSelectedItem()]
     const toLibrary = filterLibraries(toLibraries, fromLibrary)[toLibraryPopUpBtn.indexOfSelectedItem()]
     replaceLibrary(document, getLibraryId(fromLibrary), toLibrary)
-    UI.message('The library has been successfully replaced')
+
+    UI.message(`Replaced instances using “${fromLibrary.name}” with “${toLibrary.name}”`)
   }
 }
