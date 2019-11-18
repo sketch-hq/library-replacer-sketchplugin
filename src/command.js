@@ -235,7 +235,7 @@ const getLibraryNames = function(libraries) {
 const filterLibraries = function(libraries, library) {
   return libraries.filter(
     itLibrary =>
-      !(itLibrary.name === library.name && itLibrary.id === library.id)
+      !(itLibrary.name === library.name && itLibrary.id === library.id  && itLibrary.libraryType === library.libraryType)
   );
 };
 
